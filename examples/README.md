@@ -8,8 +8,9 @@ Download the 1TB data [here](https://labs.criteo.com/2013/12/download-terabyte-c
 ## Processing
 ### Competition data
 1. Run [txt2csv.py](./txt2csv.py) to convert the both the text files (train and test) into a CSV files.
-2. Split the train file into managable chunks that will fit in memory.
-3. Process the data using the spark script. 
+2. Run [split_file.py](/deepctr/dist_utils/split_file.py) to split the train file into managable chunks that will fit in memory.
+3. (Optional) store the files in a new location.
+4. Process the data using the spark script.
 
 ### 1TB data
 1. Unzip each file.  *Note: uncompressing each 14 GiB file results in a 48 GiB file.*
