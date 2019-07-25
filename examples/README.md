@@ -1,7 +1,7 @@
 # Criteo Data
 
 ## Download
-Download the classic competition data [here]().
+Download the classic competition data [here](http://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/).
 Download the 1TB data [here](https://labs.criteo.com/2013/12/download-terabyte-click-logs-2/).
 
 ## Processing
