@@ -1,8 +1,9 @@
 # Criteo Data
 
 ## Download
-Download the classic competition data [here](http://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/).
-Download the 1TB data [here](https://labs.criteo.com/2013/12/download-terabyte-click-logs-2/).
+Download the classic competition data [here](http://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/).  There should be two text files: `text.txt` and `train.txt`.
+
+Download the 1TB data [here](https://labs.criteo.com/2013/12/download-terabyte-click-logs-2/).  There are 21 days total, and each day must be downloaded seperately.  Each day is about 14 GiB compressed.
 
 ## Processing
 ### Competition data
@@ -11,7 +12,7 @@ Download the 1TB data [here](https://labs.criteo.com/2013/12/download-terabyte-c
 3. Process the data using the spark script. 
 
 ### 1TB data
-1. Unzip each file.
+1. Unzip each file.  *Note: uncompressing each 14 GiB file results in a 48 GiB file.*
 2. (Optional) store the files in a new location.
 3. Process the data using the spark script.
 
