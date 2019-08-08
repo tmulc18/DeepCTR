@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import pandas as pd
 from tensorflow import keras
@@ -20,7 +21,13 @@ class DataGenerator(keras.utils.Sequence):
     """Generates data for Keras.
     Modified from: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
     """
-    def __init__(self, list_files, nexamples, batch_size=256, shuffle=True):
+    def __init__(self, list_files, nexamples, 
+        file_index=0, 
+        batch_size=256, 
+        shuffle=True, 
+        dense_meta = "stats/competition-dense-meta.json",
+        cat_meta = "stats/competition-categorical-meta.json"
+        ):
         'Initialization'
         self.batch_size = batch_size
         self.list_files = list_files
@@ -36,8 +43,15 @@ class DataGenerator(keras.utils.Sequence):
 
         self.target = ['Label']
 
+        # load meta data
+        self.dense_meta = json.load(open(dense_meta,"r"))
+        self.cat_meta = json.load(open(cat_meta,"r"))
+        self.load_stats()
+
+        print(self.cat_meta)
+
         # initialize file
-        self.file_index = 0
+        self.file_index = file_index
         self.load_data()
 
 
@@ -50,27 +64,27 @@ class DataGenerator(keras.utils.Sequence):
         self.cur_df[self.sparse_features] = self.cur_df[self.sparse_features].fillna('-1', )
         self.cur_df[self.dense_features] = self.cur_df[self.dense_features].fillna(0, )
 
-        # 1.Label Encoding for sparse features,and do simple Transformation for dense features
-        for feat in self.sparse_features:
-            lbe = LabelEncoder()
-            self.cur_df[feat] = lbe.fit_transform(self.cur_df[feat])
-        mms = MinMaxScaler(feature_range=(0, 1))
-        self.cur_df[self.dense_features] = mms.fit_transform(self.cur_df[self.dense_features])
+        # # 1.Label Encoding for sparse features,and do simple Transformation for dense features
+        # for feat in self.sparse_features:
+        #     lbe = LabelEncoder()
+        #     self.cur_df[feat] = lbe.fit_transform(self.cur_df[feat])
+        # mms = MinMaxScaler(feature_range=(0, 1))
+        # self.cur_df[self.dense_features] = mms.fit_transform(self.cur_df[self.dense_features])
 
-        # 2.count #unique features for each sparse field,and record dense feature field name
+        # # 2.count #unique features for each sparse field,and record dense feature field name
 
-        fixlen_feature_columns = [SparseFeat(feat, self.cur_df[feat].nunique())
-                           for feat in self.sparse_features] + [DenseFeat(feat, 1,)
-                          for feat in self.dense_features]
+        # fixlen_feature_columns = [SparseFeat(feat, self.cur_df[feat].nunique())
+        #                    for feat in self.sparse_features] + [DenseFeat(feat, 1,)
+        #                   for feat in self.dense_features]
 
-        self.dnn_feature_columns = fixlen_feature_columns
-        self.linear_feature_columns = fixlen_feature_columns
+        # self.dnn_feature_columns = fixlen_feature_columns
+        # self.linear_feature_columns = fixlen_feature_columns
 
-        fixlen_feature_names = get_fixlen_feature_names(self.linear_feature_columns + self.dnn_feature_columns)
+        # fixlen_feature_names = get_fixlen_feature_names(self.linear_feature_columns + self.dnn_feature_columns)
 
         # done data transform
 
-        self.cur_array = [self.cur_df[name] for name in fixlen_feature_names]#self.cur_df.as_matrix()
+        self.cur_array = [self.cur_df[name] for name in self.fixlen_feature_names]#self.cur_df.as_matrix()
         self.cur_values = self.cur_df[self.target].values
 
         self.indexes = np.arange(len(self.cur_df))
@@ -102,6 +116,20 @@ class DataGenerator(keras.utils.Sequence):
         #X, y = self.__data_generation(list_IDs_temp)
 
         return X, y
+
+    def on_epoch_end(self):
+        pass
+
+    def load_stats(self):
+        fixlen_feature_columns = [SparseFeat(feat, self.cat_meta[feat])
+                           for feat in self.sparse_features] + [DenseFeat(feat, 1,)
+                          for feat in self.dense_features]
+
+        self.dnn_feature_columns = fixlen_feature_columns
+        self.linear_feature_columns = fixlen_feature_columns
+
+        self.fixlen_feature_names = get_fixlen_feature_names(self.linear_feature_columns + self.dnn_feature_columns)
+
 
 #    def on_epoch_end(self):
 #        'Updates indexes after each epoch'
