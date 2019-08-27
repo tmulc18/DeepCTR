@@ -56,31 +56,9 @@ class DataGenerator(keras.utils.Sequence):
 
 
     def load_data(self):
-        print("loading new file")
+        #print("loading new file")
         self.cur_file = self.list_files[self.file_index%self.num_files]
         self.cur_df = pd.read_csv(self.cur_file)
-
-        # data transform.  should remove and do in preprocessing
-        self.cur_df[self.sparse_features] = self.cur_df[self.sparse_features].fillna('-1', )
-        self.cur_df[self.dense_features] = self.cur_df[self.dense_features].fillna(0, )
-
-        # # 1.Label Encoding for sparse features,and do simple Transformation for dense features
-        # for feat in self.sparse_features:
-        #     lbe = LabelEncoder()
-        #     self.cur_df[feat] = lbe.fit_transform(self.cur_df[feat])
-        # mms = MinMaxScaler(feature_range=(0, 1))
-        # self.cur_df[self.dense_features] = mms.fit_transform(self.cur_df[self.dense_features])
-
-        # # 2.count #unique features for each sparse field,and record dense feature field name
-
-        # fixlen_feature_columns = [SparseFeat(feat, self.cur_df[feat].nunique())
-        #                    for feat in self.sparse_features] + [DenseFeat(feat, 1,)
-        #                   for feat in self.dense_features]
-
-        # self.dnn_feature_columns = fixlen_feature_columns
-        # self.linear_feature_columns = fixlen_feature_columns
-
-        # fixlen_feature_names = get_fixlen_feature_names(self.linear_feature_columns + self.dnn_feature_columns)
 
         # done data transform
 
