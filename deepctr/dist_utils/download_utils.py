@@ -5,7 +5,7 @@ from tqdm import tqdm
 from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
 
-def download_partition_s3(worker_id, num_workers, save_dir, bucket, prefix, nthreads, nval=200):
+def download_partition_s3(worker_id, num_workers, save_dir, bucket, prefix, nthreads, nval=200, ntest=None):
     """Downloads a partition of data from s3.
 
     If the buckets has L files, there are V files for validation,
@@ -25,6 +25,12 @@ def download_partition_s3(worker_id, num_workers, save_dir, bucket, prefix, nthr
 
     # partition
     fkeys.sort() # must sort so multiple workers can take subsets
+
+    # take out the test dataset
+    if ntest is not None:
+        fkeys_test = fkeys[len(fkeys)-ntest:]
+        if not os.path.exists(save_dir+"_test"): os.mkdir(save_dir+"_test")
+        fkeys = fkeys[:len(fkeys)-ntest]
 
     # randomize, but set seed so all workers randomize the same
     random.seed(1)
@@ -52,6 +58,11 @@ def download_partition_s3(worker_id, num_workers, save_dir, bucket, prefix, nthr
     def download_func_val(fkey):
         my_bucket.download_file(fkey,save_dir+"_val"+'/'+fkey.split('/')[-1])
 
+    # define download function for test
+    if ntest is not None:
+        def download_func_test(fkey):
+            my_bucket.download_file(fkey,save_dir+"_test"+'/'+fkey.split('/')[-1])
+
     # download training data
     p = ThreadPool(nthreads)
     total_files = len(fkeys)
@@ -65,4 +76,13 @@ def download_partition_s3(worker_id, num_workers, save_dir, bucket, prefix, nthr
     with tqdm(total=total_files) as pbar:
         for i,_ in tqdm(enumerate(p.imap_unordered(download_func_val,fkeys_val))):
             pbar.update()
+
+    # download test data
+    if ntest is not None:
+        p = ThreadPool(nthreads)
+        total_files = len(fkeys_test)
+        with tqdm(total=total_files) as pbar:
+            for i,_ in tqdm(enumerate(p.imap_unordered(download_func_test,fkeys_test))):
+                pbar.update()
+
 
