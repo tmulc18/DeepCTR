@@ -5,7 +5,7 @@ We noticed that the original code was unsuitable for the training models on Crit
 
 The Kaggle competition data has X total records.  We use 40,340,943 records for training, 916,835 records for validation, and 4,582,840 records for the holdout test data.  Because the data is sorted in chronological order, the test data is taken from the end of the file.
 
-The 1TB data has X total records.  We use X records for training, X records for validation, and X records for the holdout test data.  Days 0 through 18 are used for training, day 19 is used for validation, and days 20 and 21 are used for the test data.
+The 1TB data has X total records.  We use 3,463,072,915 records for training, X records for validation, and X records for the holdout test data.  Days 0 through 18 are used for training, day 19 is used for validation, and days 20 and 21 are used for the test data.
 
 ## Download
 Download the classic competition data [here](http://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/).  There should be two text files: `text.txt` and `train.txt`.
