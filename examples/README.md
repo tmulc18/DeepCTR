@@ -22,7 +22,7 @@ Download the 1TB data [here](https://labs.criteo.com/2013/12/download-terabyte-c
 
 ### Data splits
 #### Competition data
-We use the entire training data as the training dataset, and the test data as the final test dataset.  Note that within the training data, we use 20% as a holdout validation dataset.
+We use the entire training data as the training dataset, 10% of the data as a validation dataset, and the last 10% of data as the holdout test dataset.
 
 #### 1TB data
 We use days zero through eighteen as the train dataset, day nineteen for the validation dataset, and days twenty and twentyone as the test dataset.
