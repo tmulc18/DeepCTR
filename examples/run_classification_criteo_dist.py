@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.metrics import log_loss, roc_auc_score
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ProgbarLogger
+from tensorflow.keras.callbacks import ProgbarLogger, ModelCheckpoint
 from tensorflow import keras as keras
 import tensorflow as tf
 from sklearn.metrics import roc_auc_score
@@ -19,11 +19,10 @@ import glob
 def main(dataPath,dataPath_val,batch_size):
 
     # must have list of training files
-    files = glob.glob(dataPath+"/*.csv")[0:20]
+    files = glob.glob(dataPath+"/*.csv")[::5]
 
     # validation files
-    files_val = glob.glob(dataPath_val+"/*.csv")
-    print("validation files, ",files_val)
+    files_val = glob.glob(dataPath_val+"/*.csv")[::5]
     
     # Count number of examples in training data
     nexs = get_total_examples(files)
@@ -43,14 +42,19 @@ def main(dataPath,dataPath_val,batch_size):
 
     # 4.Define Model,train,predict and evaluate
     model = DeepFM(linear_feature_columns, dnn_feature_columns, task='binary')
-    optimizer = keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999,decay=0.0)
+    optimizer = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999,decay=0.0)
     model.compile(optimizer, "binary_crossentropy",
                   metrics=['binary_crossentropy', auroc], )
 
     pbar = ProgbarLogger(count_mode='steps', stateful_metrics=None)
 
+    weights_file = "model-5-lr0p001.h5"
+    model_checkpoint= ModelCheckpoint(weights_file, monitor="val_binary_crossentropy", save_best_only=True,
+                                                  save_weights_only=True, verbose=1)
+
     history = model.fit_generator(train_gen, epochs=10, verbose=1, steps_per_epoch=nexs/batch_size,
-                                  validation_data = val_gen, validation_steps=nexs/batch_size)
+                                  validation_data = val_gen, validation_steps=nexs/batch_size,
+                                  callbacks = [model_checkpoint])
     #pred_ans = model.predict(test_model_input, batch_size=256)
     #print("test LogLoss", round(log_loss(test[target].values, pred_ans), 4))
     #print("test AUC", round(roc_auc_score(test[target].values, pred_ans), 4))
